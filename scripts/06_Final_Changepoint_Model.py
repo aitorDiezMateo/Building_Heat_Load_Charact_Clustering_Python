@@ -6,16 +6,17 @@ import time
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from functions.Detect_Outliers_Model_Based_ch_3p import Detect_Outliers_Model_Based_CH_3P
 
-if len(sys.argv) < 4:
+if len(sys.argv) < 5:
     raise SystemExit(
-        "Usage: 06_Final_Changepoint_Model.py <input_filled.csv> <output_data.csv> <output_params.csv> [--verbose]"
+        "Usage: 06_Final_Changepoint_Model.py <input_filled.csv> <output_data.csv> <output_params.csv> <use_slurm> [--verbose]"
     )
 
 input_file = sys.argv[1]
 output_data_file = sys.argv[2]
 output_params_file = sys.argv[3]
+use_slurm = sys.argv[4].lower() in ("true", "1", "yes", "on")
 verbose = False
-if len(sys.argv) > 4 and sys.argv[4] in ("--verbose", "-v", "true", "True", "1"):
+if len(sys.argv) > 5 and sys.argv[5] in ("--verbose", "-v", "true", "True", "1"):
     verbose = True
 
 # Load the data
@@ -66,7 +67,7 @@ for i in unique_hours:
     
     # Get the optimal changepoint function parameters for each subset
     dat_processed, params = Detect_Outliers_Model_Based_CH_3P(
-        dat_subs_hw, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=verbose
+        dat_subs_hw, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=verbose, slurm_cluster=use_slurm
     )
     
     # Add processed data to output

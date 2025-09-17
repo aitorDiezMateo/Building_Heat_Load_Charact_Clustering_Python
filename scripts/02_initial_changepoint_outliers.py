@@ -6,15 +6,16 @@ import time
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from functions.Detect_Outliers_Model_Based_ch_3p import Detect_Outliers_Model_Based_CH_3P
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 4:
     raise SystemExit(
-        "Usage: 02_initial_changepoint_outliers.py <input_formatted.csv> <output_summary.csv> [--verbose]"
+        "Usage: 02_initial_changepoint_outliers.py <input_formatted.csv> <output_summary.csv> <use_slurm> [--verbose]"
     )
 
 input_file = sys.argv[1]
 output_file = sys.argv[2]
+use_slurm = sys.argv[3].lower() in ("true", "1", "yes", "on")
 verbose = False
-if len(sys.argv) > 3 and sys.argv[3] in ("--verbose", "-v", "true", "True", "1"):
+if len(sys.argv) > 4 and sys.argv[4] in ("--verbose", "-v", "true", "True", "1"):
     verbose = True
 
 df = pd.read_csv(input_file, sep=";")
@@ -43,7 +44,7 @@ for j in unique_hours:
     
     # Get the optimal changepoint function parameters for each subset
     _, params = Detect_Outliers_Model_Based_CH_3P(
-        df_subs_hw, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=verbose
+        df_subs_hw, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=verbose,slurm_cluster=use_slurm
     )
     
     # Take only the first solution if GA returns multiple solutions

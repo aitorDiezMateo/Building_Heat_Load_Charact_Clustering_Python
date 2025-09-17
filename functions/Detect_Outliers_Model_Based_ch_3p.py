@@ -5,6 +5,7 @@ import os
 import numpy as np
 import random
 import warnings
+from joblib import Parallel, delayed
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from functions.Changepoint_Three_Parameters import Changepoint_Three_Parameters
 
@@ -20,12 +21,11 @@ def Changepoint_Three_Parameters_OBJECTIVE_FUN(slope_Temp, slope_Irrad, intercep
 
     residuals = result_df["Power_residuals"].to_numpy(dtype=np.float64, copy=False)
     residuals = residuals[~np.isnan(residuals)]
-    # Return positive L1 loss; with FitnessMin (weights=(-1.0,)) this will be minimized
     fitness = np.sum(np.abs(residuals))
 
     return fitness
 
-def Detect_Outliers_Model_Based_CH_3P(DF_input, threshold_outlier=2, pop_size=100, max_iter=100, verbose=False):
+def Detect_Outliers_Model_Based_CH_3P(DF_input, threshold_outlier=2, pop_size=100, max_iter=100, verbose=False,slurm_cluster=False):
     # Ensure pandas DataFrame for fast scalar ops
     if not isinstance(DF_input, pd.DataFrame):
         DF_input = DF_input.compute()
@@ -70,6 +70,14 @@ def Detect_Outliers_Model_Based_CH_3P(DF_input, threshold_outlier=2, pop_size=10
         DF_Output["IS_Outlier"] = False
         return DF_Output, [0, 0, 0, 0]
     
+    # Parallel map with joblib
+    def joblib_map(func, iterable):
+        if slurm_cluster:
+            n_cores = int(os.environ.get("SLURM_CPUS_PER_TASK", os.cpu_count()))
+        else:
+            n_cores = -1
+        return Parallel(n_jobs=n_cores)(delayed(func)(item) for item in iterable)
+
     # Step 2: Define fitness function
     def fitness_function(individual):
         slope_Temp, slope_Irrad, intercept, minimum = individual
@@ -105,6 +113,10 @@ def Detect_Outliers_Model_Based_CH_3P(DF_input, threshold_outlier=2, pop_size=10
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     toolbox.register("evaluate", fitness_function)
+    
+    # Use joblib's parallel map
+    toolbox.register("map", joblib_map)
+    
     # Bounded crossover and mutation to keep genes within [low, up]
     toolbox.register(
         "mate",

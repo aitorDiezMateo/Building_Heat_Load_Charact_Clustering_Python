@@ -8,9 +8,9 @@ from sklearn.model_selection import train_test_split
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from functions.Detect_Outliers_Model_Based_ch_3p import Detect_Outliers_Model_Based_CH_3P
 
-if len(sys.argv) < 5:
+if len(sys.argv) < 6:
     raise SystemExit(
-        "Usage: 09_Changepoint_Clusters.py <input_data.csv> <clusters.csv> <output_clust_params.csv> <output_pred_params.csv> [--verbose]"
+        "Usage: 09_Changepoint_Clusters.py <input_data.csv> <clusters.csv> <output_clust_params.csv> <output_pred_params.csv> <use_slurm> [--verbose]"
     )
 
 # Get command line arguments
@@ -18,8 +18,9 @@ input_data_file = sys.argv[1]
 input_cluster_file = sys.argv[2]
 output_clust_params = sys.argv[3]
 output_clust_pred_params = sys.argv[4]
+use_slurm = sys.argv[5].lower() in ("true", "1", "yes", "on")
 verbose = False
-if len(sys.argv) > 5 and sys.argv[5] in ("--verbose", "-v", "true", "True", "1"):
+if len(sys.argv) > 6 and sys.argv[6] in ("--verbose", "-v", "true", "True", "1"):
     verbose = True
 
 if verbose:
@@ -153,7 +154,7 @@ for i, cluster_hour in enumerate(unique_cluster_hours):
     
     # Get the optimal changepoint function parameters for each subset
     dat_processed, params = Detect_Outliers_Model_Based_CH_3P(
-        dat_subs_clust, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=False
+        dat_subs_clust, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=False,slurm_cluster=use_slurm
     )
     
     # Add processed data to output
@@ -216,7 +217,7 @@ for i, cluster_hour_pred in enumerate(unique_cluster_hours_pred):
     
     # Get the optimal changepoint function parameters for each subset
     dat_processed, params = Detect_Outliers_Model_Based_CH_3P(
-        dat_subs_clust, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=False
+        dat_subs_clust, threshold_outlier=1.96, pop_size=50, max_iter=100, verbose=False,slurm_cluster=use_slurm
     )
     
     # Add processed data to output
