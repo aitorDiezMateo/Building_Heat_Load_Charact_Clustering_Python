@@ -46,13 +46,12 @@ rule all:
 
 rule load_data:
     input:
-        data="data/{sample}.csv",
-        weather="data/weather_irradiation.csv"
+        data="data/{sample}.csv"
     output:
         "output/{sample}_01_formatted.csv"
     threads: 1
     shell:
-        "{PATH_TO_PYTHON} scripts/01_load_data.py {input.data} {input.weather} {output}"
+        "{PATH_TO_PYTHON} scripts/01_load_data.py {input.data} {output}"
 
 rule initial_changepoint_outliers:
     input:

@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from functions.Format_Input import format_input
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 2:
     raise SystemExit(
         "Usage: 01_load_data.py <input_data.csv> <output_formatted.csv> [--verbose]"
     )

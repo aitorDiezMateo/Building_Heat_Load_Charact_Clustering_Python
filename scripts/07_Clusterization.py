@@ -30,6 +30,9 @@ if len(sys.argv) > 9 and sys.argv[9] in ("--verbose", "-v", "true", "True", "1")
 import os
 output_dir = os.path.dirname(output_profiles1)
 
+# Extract sample name from input file path
+sample_name = os.path.splitext(os.path.basename(input_file))[0].replace('_06_final_processed_data', '')
+
 # Load the data
 dat = pd.read_csv(input_file, sep=";")
 
@@ -274,7 +277,7 @@ for k in range(optimal_k):
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'07_ClusterN{k+1}_001.jpg'), dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, f'{sample_name}_07_ClusterN{k+1}_001.jpg'), dpi=300, bbox_inches='tight')
     plt.close()
 
 # Load profiles based on quantiles
@@ -307,7 +310,7 @@ for k in range(optimal_k):
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'07_ClusterN{k+1}_002.jpg'), dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, f'{sample_name}_07_ClusterN{k+1}_002.jpg'), dpi=300, bbox_inches='tight')
     plt.close()
 
 # Additional visualization: All cluster profiles in subplots
@@ -389,7 +392,7 @@ for k in range(optimal_k):
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'07_ClusterN{k+1}_003.jpg'), dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, f'{sample_name}_07_ClusterN{k+1}_003.jpg'), dpi=300, bbox_inches='tight')
     plt.close()
 
 if verbose:
